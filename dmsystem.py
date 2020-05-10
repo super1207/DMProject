@@ -1,20 +1,17 @@
 '''
-@Author: super1207
-@Date: 2020-05-10 17:53:55
-@LastEditTime: 2020-05-10 22:50:06
-@Description: 大漠插件7.1904[系统]API部分的python实现
-@FilePath: \win\win.py
-'''
-
-'''
 /*
- * Copyright 2020 super1207 and contributors.
+ * Copyright 2020 DMProject and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
  *
  * https://github.com/super1207/DMProject/blob/master/LICENSE
  */
+'''
+
+'''
+@Description: 大漠插件7.1904[系统]API部分的python实现
+@FilePath: dmsystem.py
 '''
 
 import ctypes
