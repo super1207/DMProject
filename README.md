@@ -17,34 +17,35 @@
 * [x] GetClipboard 获取剪贴板的内容
 * [x] GetCpuType 获取当前CPU类型,intel或者amd.
 * [x] GetDir 得到系统的路径
-* [ ] GetDiskSerial 获取本机的硬盘序列号.支持ide scsi硬盘. 要求调用进程必须有管理员权限. 否则返回空串.
-* [ ] GetDisplayInfo 获取本机的显卡信息.
-* [ ] GetDPI 判断当前系统的DPI(文字缩放)是不是100%缩放.
-* [ ] GetLocale 判断当前系统使用的非UNICODE字符集是否是GB2312(不会实现)
-* [ ] GetMachineCode 获取本机的机器码.(带网卡). 此机器码用于插件网站后台.(不会实现)
-* [ ] GetMachineCodeNoMac 获取本机的机器码.(不带网卡)(不会实现)
-* [ ] GetNetTime 从网络获取当前北京时间.
-* [ ] GetNetTimeByIp 根据指定时间服务器IP,从网络获取当前北京时间.
-* [ ] GetNetTimeSafe 请使用GetNetTimeByIp代替
-* [ ] GetOsBuildNumber 得到操作系统的build版本号.  比如win10 16299,那么返回的就是16299. 其他类似.
-* [ ] GetOsType 得到操作系统的类型.
-* [ ] GetScreenDepth 获取屏幕的色深.
-* [ ] GetScreenHeight 获取屏幕的高度. 
-* [ ] GetScreenWidth 获取屏幕的宽度. 
-* [ ] GetTime 获取当前系统从开机到现在所经历过的时间，单位是毫秒.
-* [ ] Is64Bit 判断当前系统是否是64位操作系统
-* [ ] Play 播放指定的MP3或者wav文件.
-* [ ] RunApp 运行指定的应用程序.
-* [ ] SetClipboard 设置剪贴板的内容
-* [ ] SetDisplayAcceler 设置当前系统的硬件加速级别.
-* [ ] SetLocale 设置当前系统的非UNICOD字符集.(不会实现)
-* [ ] SetScreen 设置系统的分辨率 系统色深 
-* [ ] SetUAC 设置当前系统的UAC.
+* [x] GetDiskSerial 获取本机的硬盘序列号.支持ide scsi硬盘. 要求调用进程必须有管理员权限. 否则返回空串.
+* [ ] GetDisplayInfo 获取本机的显卡信息.(暂不实现)
+* [x] GetDPI 判断当前系统的DPI(文字缩放)是不是100%缩放.
+* [ ] GetLocale 判断当前系统使用的非UNICODE字符集是否是GB2312(暂不实现)
+* [x] GetMachineCode 获取本机的机器码.(带网卡). 此机器码用于插件网站后台. (实现不完整)
+* [ ] GetMachineCodeNoMac 获取本机的机器码.(不带网卡)(暂不实现)
+* [x] GetNetTime 从网络获取当前北京时间.
+* [x] GetNetTimeByIp 根据指定时间服务器IP,从网络获取当前北京时间.
+* [x] GetNetTimeSafe 请使用GetNetTimeByIp代替
+* [x] GetOsBuildNumber 得到操作系统的build版本号.  比如win10 16299,那么返回的就是16299. 其他类似.
+* [x] GetOsType 得到操作系统的类型.
+* [x] GetScreenDepth 获取屏幕的色深.
+* [x] GetScreenHeight 获取屏幕的高度. 
+* [x] GetScreenWidth 获取屏幕的宽度. 
+* [x] GetTime 获取当前系统从开机到现在所经历过的时间，单位是毫秒.
+* [x] Is64Bit 判断当前系统是否是64位操作系统
+* [x] Play 播放指定的MP3或者wav文件.
+* [x] RunApp 运行指定的应用程序.(实现不完整)
+* [x] SetClipboard 设置剪贴板的内容
+* [ ] SetDisplayAcceler 设置当前系统的硬件加速级别.(暂不实现)
+* [ ] SetLocale 设置当前系统的非UNICOD字符集.(暂不实现)
+* [x] SetScreen 设置系统的分辨率 系统色深 
+* [x] SetUAC 设置当前系统的UAC,重启生效.
 * [ ] ShowTaskBarIcon 显示或者隐藏指定窗口在任务栏的图标.(暂不实现)
-* [ ] Stop 停止指定的音乐.
+* [x] Stop 停止指定的音乐.
 ### 文件
 ### 键鼠
 ### 窗口
 ### 内存
 ### 图色
 ### (待定)
+
