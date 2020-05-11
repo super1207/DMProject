@@ -21,8 +21,8 @@
 * [ ] GetDisplayInfo 获取本机的显卡信息.(暂不实现)
 * [x] GetDPI 判断当前系统的DPI(文字缩放)是不是100%缩放.
 * [ ] GetLocale 判断当前系统使用的非UNICODE字符集是否是GB2312(暂不实现)
-* [x] GetMachineCode 获取本机的机器码.(带网卡). 此机器码用于插件网站后台. (实现不完整)
-* [ ] GetMachineCodeNoMac 获取本机的机器码.(不带网卡)(暂不实现)
+* [ ] GetMachineCode 获取本机的机器码.(带网卡). 此机器码用于插件网站后台. (暂不实现)
+* [x] GetMachineCodeNoMac 获取本机的机器码.(不带网卡)(实现不完整)
 * [x] GetNetTime 从网络获取当前北京时间.
 * [x] GetNetTimeByIp 根据指定时间服务器IP,从网络获取当前北京时间.
 * [x] GetNetTimeSafe 请使用GetNetTimeByIp代替
