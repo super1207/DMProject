@@ -27,7 +27,7 @@ import subprocess
 
 
 
-class WinSystem():
+class DMSystem():
     winKernel32 = ctypes.windll.kernel32
     winuser32 = ctypes.windll.LoadLibrary('user32.dll')
     wingdi32 = ctypes.windll.LoadLibrary('gdi32.dll')
@@ -35,14 +35,14 @@ class WinSystem():
     winwinmm = ctypes.windll.LoadLibrary('winmm.dll')
     @staticmethod
     def Beep(f,duration)->None:
-        is_ok:bool = WinSystem.winKernel32.Beep(f,duration)
+        is_ok:bool = DMSystem.winKernel32.Beep(f,duration)
         if not is_ok:
             raise Exception('Call Beep failed')
     @staticmethod
     def CheckFontSmooth()->bool:
         ret = ctypes.c_bool()
         SPI_GETFONTSMOOTHING = 0x004A
-        is_ok:bool = WinSystem.winuser32.SystemParametersInfoW(SPI_GETFONTSMOOTHING,0, ctypes.pointer(ret), 0)
+        is_ok:bool = DMSystem.winuser32.SystemParametersInfoW(SPI_GETFONTSMOOTHING,0, ctypes.pointer(ret), 0)
         if not is_ok:
             raise Exception('Call CheckFontSmooth failed')
         return ret.value
@@ -53,7 +53,7 @@ class WinSystem():
         return value == 1
     @staticmethod
     def Delay(mis)->bool:
-        is_ok:bool = (WinSystem.winKernel32.Sleep(mis) == 0)
+        is_ok:bool = (DMSystem.winKernel32.Sleep(mis) == 0)
         if not is_ok:
             raise Exception('Call Delay failed')
     @staticmethod
@@ -66,37 +66,37 @@ class WinSystem():
         ret = ctypes.c_bool()
         SPI_SETSCREENSAVEACTIVE = 0x0011
         SPIF_SENDWININICHANGE = 0x0002
-        is_ok:bool = WinSystem.winuser32.SystemParametersInfoW(SPI_SETSCREENSAVEACTIVE,0, ctypes.pointer(ret), SPIF_SENDWININICHANGE)
+        is_ok:bool = DMSystem.winuser32.SystemParametersInfoW(SPI_SETSCREENSAVEACTIVE,0, ctypes.pointer(ret), SPIF_SENDWININICHANGE)
         if not is_ok:
             raise Exception('Call DisableCloseDisplayAndSleep failed')
     @staticmethod
     def DisableFontSmooth() -> None:
         SPI_SETFONTSMOOTHING  = 0x004B
         SPIF_SENDWININICHANGE = 0x0002
-        is_ok:bool = WinSystem.winuser32.SystemParametersInfoW(SPI_SETSCREENSAVEACTIVE,0, 0, SPIF_SENDWININICHANGE)
+        is_ok:bool = DMSystem.winuser32.SystemParametersInfoW(SPI_SETSCREENSAVEACTIVE,0, 0, SPIF_SENDWININICHANGE)
         if not is_ok:
             raise Exception('Call DisableFontSmooth failed')
     @staticmethod
     def DisablePowerSave() -> None:
         SPI_SETLOWPOWERTIMEOUT  = 0x0051
         SPI_SETPOWEROFFTIMEOUT  = 0x0052
-        is_ok:bool = WinSystem.winuser32.SystemParametersInfo(SPI_SETLOWPOWERTIMEOUT,0,0,0)  
+        is_ok:bool = DMSystem.winuser32.SystemParametersInfo(SPI_SETLOWPOWERTIMEOUT,0,0,0)  
         if not is_ok:
             raise Exception('Call DisablePowerSave failed')
-        is_ok:bool = WinSystem.winuser32.SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT,0,0,0)
+        is_ok:bool = DMSystem.winuser32.SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT,0,0,0)
         if not is_ok:
             raise Exception('Call DisablePowerSave failed')
     @staticmethod
     def DisableScreenSave() -> None:
         SPI_SETSCREENSAVEACTIVE  = 0x0011
-        is_ok:bool = WinSystem.winuser32.SystemParametersInfo(SPI_SETSCREENSAVEACTIVE,0,0,0)  
+        is_ok:bool = DMSystem.winuser32.SystemParametersInfo(SPI_SETSCREENSAVEACTIVE,0,0,0)  
         if not is_ok:
             raise Exception('Call DisablePowerSave failed')
     @staticmethod
     def EnableFontSmooth() -> None:
         SPI_SETFONTSMOOTHING  = 0x004B
         SPIF_SENDWININICHANGE = 0x0002
-        is_ok:bool = WinSystem.winuser32.SystemParametersInfoW(SPI_SETSCREENSAVEACTIVE,1,0, SPIF_SENDWININICHANGE)
+        is_ok:bool = DMSystem.winuser32.SystemParametersInfoW(SPI_SETSCREENSAVEACTIVE,1,0, SPIF_SENDWININICHANGE)
         if not is_ok:
             raise Exception('Call EnableFontSmooth failed')
     @staticmethod
@@ -107,11 +107,11 @@ class WinSystem():
         EWX_FORCE = 0x0004
         is_ok:bool = False
         if type_ == 0:
-            is_ok = WinSystem.winuser32.ExitWindowsEx(EWX_FORCE | EWX_LOGOFF)
+            is_ok = DMSystem.winuser32.ExitWindowsEx(EWX_FORCE | EWX_LOGOFF)
         elif type_ == 1:
-            is_ok = WinSystem.winuser32.ExitWindowsEx(EWX_FORCE | EWX_POWEROFF)
+            is_ok = DMSystem.winuser32.ExitWindowsEx(EWX_FORCE | EWX_POWEROFF)
         elif type == 2:
-            is_ok = WinSystem.winuser32.ExitWindowsEx(EWX_FORCE | EWX_REBOOT)
+            is_ok = DMSystem.winuser32.ExitWindowsEx(EWX_FORCE | EWX_REBOOT)
         else:
             raise Exception('Call ExitOs failed')
         if not is_ok:
@@ -119,15 +119,15 @@ class WinSystem():
     @staticmethod
     def GetClipboard() -> str:
         CF_UNICODETEXT = 13
-        is_ok:bool = WinSystem.winuser32.OpenClipboard(0)
+        is_ok:bool = DMSystem.winuser32.OpenClipboard(0)
         if not is_ok:
             raise Exception('Call GetClipboard failed')
-        hd=WinSystem.winuser32.GetClipboardData(CF_UNICODETEXT)
+        hd=DMSystem.winuser32.GetClipboardData(CF_UNICODETEXT)
         if not hd:
-            WinSystem.winuser32.CloseClipboard()
+            DMSystem.winuser32.CloseClipboard()
             raise Exception('Call GetClipboard failed:Is not UNICODETEXT')
         ss=ctypes.c_wchar_p(hd) 
-        WinSystem.winuser32.CloseClipboard()
+        DMSystem.winuser32.CloseClipboard()
         return ss.value
     @staticmethod
     def GetCpuType() -> int:
@@ -145,7 +145,7 @@ class WinSystem():
                 ("wProcessorRevision",ctypes.wintypes.WORD),
             ]
         lpSystemInfo = _SYSTEM_INFO()
-        WinSystem.winKernel32.GetNativeSystemInfo(ctypes.byref(lpSystemInfo))
+        DMSystem.winKernel32.GetNativeSystemInfo(ctypes.byref(lpSystemInfo))
         if(lpSystemInfo.dwProcessorType in [386,486,586,2200]):
             return 1
         elif lpSystemInfo.dwProcessorType == 8664:
@@ -155,31 +155,31 @@ class WinSystem():
     def GetDir(type_) -> str:
         if type_ == 0:
             pathstr = ctypes.create_string_buffer(''.encode(), 1000)
-            loadlen = WinSystem.winKernel32.GetCurrentDirectoryA(1000,pathstr)
+            loadlen = DMSystem.winKernel32.GetCurrentDirectoryA(1000,pathstr)
             if loadlen <= 0:
                 raise Exception('Call GetDir failed')
             return ctypes.string_at(pathstr).decode('GB2312')
         elif type_ == 1:
             pathstr = ctypes.create_string_buffer(''.encode(), 1000)
-            loadlen = WinSystem.winKernel32.GetSystemDirectoryA(pathstr,1000)
+            loadlen = DMSystem.winKernel32.GetSystemDirectoryA(pathstr,1000)
             if loadlen <= 0:
                 raise Exception('Call GetDir failed')
             return ctypes.string_at(pathstr).decode('GB2312')
         elif type_ == 2:
             pathstr = ctypes.create_string_buffer(''.encode(), 1000)
-            loadlen = WinSystem.winKernel32.GetWindowsDirectoryA(pathstr,1000)
+            loadlen = DMSystem.winKernel32.GetWindowsDirectoryA(pathstr,1000)
             if loadlen <= 0:
                 raise Exception('Call GetDir failed')
             return ctypes.string_at(pathstr).decode('GB2312')
         elif type_ == 3:
             pathstr = ctypes.create_string_buffer(''.encode(), 1000)
-            loadlen = WinSystem.winKernel32.GetTempPathA(1000,pathstr)
+            loadlen = DMSystem.winKernel32.GetTempPathA(1000,pathstr)
             if loadlen <= 0:
                 raise Exception('Call GetDir failed')
             return ctypes.string_at(pathstr).decode('GB2312')
         elif type_ == 4:
             pathstr = ctypes.create_string_buffer(''.encode(), 1000)
-            loadlen = WinSystem.winKernel32.GetModuleFileNameA(0,pathstr,1000)
+            loadlen = DMSystem.winKernel32.GetModuleFileNameA(0,pathstr,1000)
             if loadlen <= 0:
                 raise Exception('Call GetDir failed')
             return ctypes.string_at(pathstr).decode('GB2312')
@@ -200,14 +200,14 @@ class WinSystem():
         HORZRES = 8
         DESKTOPVERTRES = 117
         VERTRES = 10
-        hdc = WinSystem.winuser32.GetDC(0)
-        t = WinSystem.wingdi32.GetDeviceCaps(hdc, DESKTOPHORZRE)
-        d = WinSystem.wingdi32.GetDeviceCaps(hdc, HORZRES)
+        hdc = DMSystem.winuser32.GetDC(0)
+        t = DMSystem.wingdi32.GetDeviceCaps(hdc, DESKTOPHORZRE)
+        d = DMSystem.wingdi32.GetDeviceCaps(hdc, HORZRES)
         if t != d:ret = False
-        t = WinSystem.wingdi32.GetDeviceCaps(hdc, DESKTOPVERTRES)
-        d = WinSystem.wingdi32.GetDeviceCaps(hdc, VERTRES)
+        t = DMSystem.wingdi32.GetDeviceCaps(hdc, DESKTOPVERTRES)
+        d = DMSystem.wingdi32.GetDeviceCaps(hdc, VERTRES)
         if t != d:ret = False
-        WinSystem.winuser32.ReleaseDC(0, hdc)
+        DMSystem.winuser32.ReleaseDC(0, hdc)
         return ret
     @staticmethod
     def GetMachineCode() -> str:
@@ -236,17 +236,17 @@ class WinSystem():
         return rettime
     @staticmethod
     def GetNetTimeSafe(ip) -> str:
-        return WinSystem.GetNetTimeByIp(ip)
+        return DMSystem.GetNetTimeByIp(ip)
     @staticmethod
     def GetOsBuildNumber() -> int:
         dwBuildNumber = ctypes.wintypes.DWORD()
-        WinSystem.winntdll.RtlGetNtVersionNumbers(0,0,ctypes.byref(dwBuildNumber))
+        DMSystem.winntdll.RtlGetNtVersionNumbers(0,0,ctypes.byref(dwBuildNumber))
         return dwBuildNumber.value & 0xffff
     @staticmethod
     def GetOsType() -> int:
         dwMajorVer = ctypes.wintypes.DWORD()
         dwMinorVer = ctypes.wintypes.DWORD()
-        WinSystem.winntdll.RtlGetNtVersionNumbers(ctypes.byref(dwMajorVer),ctypes.byref(dwMinorVer),0)
+        DMSystem.winntdll.RtlGetNtVersionNumbers(ctypes.byref(dwMajorVer),ctypes.byref(dwMinorVer),0)
         dwMajorVer = dwMajorVer.value
         dwMinorVer = dwMinorVer.value
         if dwMajorVer == 4:
@@ -270,27 +270,27 @@ class WinSystem():
     @staticmethod
     def GetScreenDepth() -> int:
         BITSPIXEL = 12
-        hdc = WinSystem.winuser32.GetDC(0)
-        dmBitDepth  = WinSystem.wingdi32.GetDeviceCaps(hdc,BITSPIXEL)
-        WinSystem.winuser32.ReleaseDC(0, hdc)
+        hdc = DMSystem.winuser32.GetDC(0)
+        dmBitDepth  = DMSystem.wingdi32.GetDeviceCaps(hdc,BITSPIXEL)
+        DMSystem.winuser32.ReleaseDC(0, hdc)
         return dmBitDepth
     @staticmethod
     def GetScreenHeight() -> int:
         VERTRES = 10
-        hdc = WinSystem.winuser32.GetDC(0)
-        height  = WinSystem.wingdi32.GetDeviceCaps(hdc,VERTRES)
-        WinSystem.winuser32.ReleaseDC(0, hdc)
+        hdc = DMSystem.winuser32.GetDC(0)
+        height  = DMSystem.wingdi32.GetDeviceCaps(hdc,VERTRES)
+        DMSystem.winuser32.ReleaseDC(0, hdc)
         return height
     @staticmethod
     def GetScreenWidth() -> int:
         HORZRES = 8
-        hdc = WinSystem.winuser32.GetDC(0)
-        weight  = WinSystem.wingdi32.GetDeviceCaps(hdc,HORZRES)
-        WinSystem.winuser32.ReleaseDC(0, hdc)
+        hdc = DMSystem.winuser32.GetDC(0)
+        weight  = DMSystem.wingdi32.GetDeviceCaps(hdc,HORZRES)
+        DMSystem.winuser32.ReleaseDC(0, hdc)
         return weight
     @staticmethod
     def GetTime() -> int:
-        return WinSystem.winKernel32.timeGetTime()
+        return DMSystem.winKernel32.timeGetTime()
     @staticmethod
     def Is64Bit() -> bool:
         class _SYSTEM_INFO(ctypes.Structure):
@@ -307,7 +307,7 @@ class WinSystem():
                 ("wProcessorRevision",ctypes.wintypes.WORD),
             ]
         lpSystemInfo = _SYSTEM_INFO()
-        WinSystem.winKernel32.GetNativeSystemInfo(ctypes.byref(lpSystemInfo))
+        DMSystem.winKernel32.GetNativeSystemInfo(ctypes.byref(lpSystemInfo))
         PROCESSOR_ARCHITECTURE_IA64 = 6
         PROCESSOR_ARCHITECTURE_AMD64 = 9
         if lpSystemInfo.dwOemId in [PROCESSOR_ARCHITECTURE_IA64,PROCESSOR_ARCHITECTURE_AMD64]:
@@ -318,12 +318,12 @@ class WinSystem():
     def Play(media_file)->str:
         mp3id = str(uuid.uuid1())
         cmd = "open \""+ media_file + "\" alias " + mp3id
-        status = WinSystem.winwinmm.mciSendStringW(cmd,0,0,0)
+        status = DMSystem.winwinmm.mciSendStringW(cmd,0,0,0)
         if status != 0:
             raise Exception('Call Play failed')
-        status = WinSystem.winwinmm.mciSendStringW("play "+ mp3id,0,0,0)
+        status = DMSystem.winwinmm.mciSendStringW("play "+ mp3id,0,0,0)
         if status != 0:
-            WinSystem.winwinmm.mciSendStringW("close "+ mp3id,0,0,0)
+            DMSystem.winwinmm.mciSendStringW("close "+ mp3id,0,0,0)
             raise Exception('Call Play failed')
         return mp3id
     @staticmethod
@@ -353,9 +353,9 @@ class WinSystem():
         return winreg.SetValueEx(key,'EnableLUA',0,winreg.REG_DWORD,0)
     @staticmethod
     def Stop(id_) -> None:
-        status = WinSystem.winwinmm.mciSendStringW("stop "+ id_,0,0,0)
+        status = DMSystem.winwinmm.mciSendStringW("stop "+ id_,0,0,0)
         if status != 0:
             raise Exception('Call Stop failed')
-        status = WinSystem.winwinmm.mciSendStringW("close "+ id_,0,0,0)
+        status = DMSystem.winwinmm.mciSendStringW("close "+ id_,0,0,0)
         if status != 0:
             raise Exception('Call Stop failed')
