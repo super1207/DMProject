@@ -2,7 +2,7 @@
 用最少的依赖实现python版大漠插件(大漠插件v7.1904帮助文档：https://lanzous.com/icguueh)
 * 一切开发旨在学习，请勿用于非法用途
 ## API实现情况
-### 系统
+### 系统(dmsystem.py)
 * [x] Beep 蜂鸣器
 * [x] CheckFontSmooth 检测当前系统是否有开启屏幕字体平滑.  
 * [x] CheckUAC 检测当前系统是否有开启UAC.
@@ -42,7 +42,33 @@
 * [x] SetUAC 设置当前系统的UAC,重启生效.
 * [ ] ShowTaskBarIcon 显示或者隐藏指定窗口在任务栏的图标.(暂不实现)
 * [x] Stop 停止指定的音乐.
-### 文件
+### 文件(dmfile.py)
+* [ ] CopyFile 拷贝文件.
+* [ ] CreateFolder 创建指定目录.
+* [ ] DecodeFile 解密指定的文件.
+* [ ] DeleteFile 删除文件.
+* [ ] DeleteFolder 删除指定目录. 
+* [ ] DeleteIni 删除指定的ini小节.
+* [ ] DeleteIniPwd 删除指定的ini小节.支持加密文件
+* [ ] DownloadFile 从internet上下载一个文件.
+* [ ] EncodeFile 加密指定的文件. 
+* [ ] EnumIniKey 根据指定的ini文件以及section,枚举此section中所有的key名
+* [ ] EnumIniKeyPwd 根据指定的ini文件以及section,枚举此section中所有的key名.可支持加密文件
+* [ ] EnumIniSection 根据指定的ini文件,枚举此ini中所有的Section(小节名)
+* [ ] EnumIniSectionPwd 根据指定的ini文件,枚举此ini中所有的Section(小节名) 可支持加密文件
+* [ ] GetFileLength 获取指定的文件长度.
+* [ ] GetRealPath 获取指定文件或目录的真实路径
+* [ ] IsFileExist 判断指定文件是否存在.
+* [ ] IsFolderExist 判断指定目录是否存在. 
+* [ ] MoveFile 移动文件. 
+* [ ] ReadFile 从指定的文件读取内容. 
+* [ ] ReadIni 从Ini中读取指定信息.
+* [ ] ReadIniPwd 从Ini中读取指定信息.可支持加密文件 
+* [ ] SelectDirectory 弹出选择文件夹对话框，并返回选择的文件夹.
+* [ ] SelectFile 弹出选择文件对话框，并返回选择的文件.
+* [ ] WriteFile 向指定文件追加字符串. 
+* [ ] WriteIni 向指定的Ini写入信息.  
+* [ ] WriteIniPwd 向指定的Ini写入信息.支持加密文件 
 ### 键鼠
 ### 窗口
 ### 内存
