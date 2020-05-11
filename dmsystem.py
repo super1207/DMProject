@@ -19,10 +19,20 @@ import winreg
 import random
 import traceback
 import ctypes.wintypes
+import urllib.request
+import time
+import platform
+import uuid
+import subprocess
+
+
 
 class WinSystem():
     winKernel32 = ctypes.windll.kernel32
     winuser32 = ctypes.windll.LoadLibrary('user32.dll')
+    wingdi32 = ctypes.windll.LoadLibrary('gdi32.dll')
+    winntdll = ctypes.windll.LoadLibrary('ntdll.dll')
+    winwinmm = ctypes.windll.LoadLibrary('winmm.dll')
     @staticmethod
     def Beep(f,duration)->None:
         is_ok:bool = WinSystem.winKernel32.Beep(f,duration)
@@ -114,12 +124,13 @@ class WinSystem():
             raise Exception('Call GetClipboard failed')
         hd=WinSystem.winuser32.GetClipboardData(CF_UNICODETEXT)
         if not hd:
+            WinSystem.winuser32.CloseClipboard()
             raise Exception('Call GetClipboard failed:Is not UNICODETEXT')
         ss=ctypes.c_wchar_p(hd) 
         WinSystem.winuser32.CloseClipboard()
         return ss.value
     @staticmethod
-    def GetCpuType():
+    def GetCpuType() -> int:
         class _SYSTEM_INFO(ctypes.Structure):
             _fields_ = [
                 ("dwOemId",ctypes.wintypes.DWORD),
@@ -134,14 +145,14 @@ class WinSystem():
                 ("wProcessorRevision",ctypes.wintypes.WORD),
             ]
         lpSystemInfo = _SYSTEM_INFO()
-        WinSystem.winKernel32.GetSystemInfo(ctypes.byref(lpSystemInfo))
+        WinSystem.winKernel32.GetNativeSystemInfo(ctypes.byref(lpSystemInfo))
         if(lpSystemInfo.dwProcessorType in [386,486,586,2200]):
             return 1
         elif lpSystemInfo.dwProcessorType == 8664:
             return 2
         else: return 0
     @staticmethod
-    def GetDir(type_):
+    def GetDir(type_) -> str:
         if type_ == 0:
             pathstr = ctypes.create_string_buffer(''.encode(), 1000)
             loadlen = WinSystem.winKernel32.GetCurrentDirectoryA(1000,pathstr)
@@ -173,5 +184,178 @@ class WinSystem():
                 raise Exception('Call GetDir failed')
             return ctypes.string_at(pathstr).decode('GB2312')
         else:raise Exception('Call GetDir failed')
-
-    
+    @staticmethod
+    def GetDiskSerial() -> str:
+        '''需安装wmi,且winxp无效'''
+        import wmi
+        disk = [physical_disk.SerialNumber.strip() for physical_disk in wmi.WMI().Win32_DiskDrive()]
+        if len(disk) == 0:
+            raise Exception('Call GetDiskSerial failed')
+        else:
+            return disk[len(disk) - 1]
+    @staticmethod
+    def GetDPI() -> bool:
+        ret:bool = True
+        DESKTOPHORZRE = 118
+        HORZRES = 8
+        DESKTOPVERTRES = 117
+        VERTRES = 10
+        hdc = WinSystem.winuser32.GetDC(0)
+        t = WinSystem.wingdi32.GetDeviceCaps(hdc, DESKTOPHORZRE)
+        d = WinSystem.wingdi32.GetDeviceCaps(hdc, HORZRES)
+        if t != d:ret = False
+        t = WinSystem.wingdi32.GetDeviceCaps(hdc, DESKTOPVERTRES)
+        d = WinSystem.wingdi32.GetDeviceCaps(hdc, VERTRES)
+        if t != d:ret = False
+        WinSystem.winuser32.ReleaseDC(0, hdc)
+        return ret
+    @staticmethod
+    def GetMachineCode() -> str:
+        '''需安装wmi,且winxp无效'''
+        import wmi
+        board = [physical_board for physical_board in wmi.WMI().Win32_BaseBoard()]
+        if len(board) == 0:
+            raise Exception('Call GetMachineCode failed')
+        else:
+            return board[len(board) - 1].qualifiers['UUID'][1:-1].strip()
+    @staticmethod
+    def GetNetTime() -> str:
+        resp = urllib.request.urlopen('http://www.baidu.com')
+        ts = resp.info()['Date']
+        ltime= time.strptime(ts[5:25], "%d %b %Y %H:%M:%S")
+        ttime=time.localtime(time.mktime(ltime)+8*60*60)
+        rettime = "%u-%02u-%02u %02u:%02u:%02u"%(ttime.tm_year,ttime.tm_mon,ttime.tm_mday,ttime.tm_hour,ttime.tm_min,ttime.tm_sec)
+        return rettime
+    @staticmethod
+    def GetNetTimeByIp(ip) -> str:
+        resp = urllib.request.urlopen("http://"+ip)
+        ts = resp.info()['Date']
+        ltime= time.strptime(ts[5:25], "%d %b %Y %H:%M:%S")
+        ttime=time.localtime(time.mktime(ltime)+8*60*60)
+        rettime = "%u-%02u-%02u %02u:%02u:%02u"%(ttime.tm_year,ttime.tm_mon,ttime.tm_mday,ttime.tm_hour,ttime.tm_min,ttime.tm_sec)
+        return rettime
+    @staticmethod
+    def GetNetTimeSafe(ip) -> str:
+        return WinSystem.GetNetTimeByIp(ip)
+    @staticmethod
+    def GetOsBuildNumber() -> int:
+        dwBuildNumber = ctypes.wintypes.DWORD()
+        WinSystem.winntdll.RtlGetNtVersionNumbers(0,0,ctypes.byref(dwBuildNumber))
+        return dwBuildNumber.value & 0xffff
+    @staticmethod
+    def GetOsType() -> int:
+        dwMajorVer = ctypes.wintypes.DWORD()
+        dwMinorVer = ctypes.wintypes.DWORD()
+        WinSystem.winntdll.RtlGetNtVersionNumbers(ctypes.byref(dwMajorVer),ctypes.byref(dwMinorVer),0)
+        dwMajorVer = dwMajorVer.value
+        dwMinorVer = dwMinorVer.value
+        if dwMajorVer == 4:
+            return 0
+        elif dwMajorVer == 5:
+            if dwMinorVer in [0,1]:
+                return 1
+            else:
+                return 2
+        elif dwMajorVer == 6 and dwMinorVer == 1:
+            return 3
+        elif dwMajorVer == 6 and dwMinorVer == 0:
+            return 4
+        elif dwMajorVer == 6 and dwMinorVer == 2:
+            return 5
+        elif dwMajorVer == 6 and dwMinorVer == 3:
+            return 6
+        elif dwMajorVer == 10:
+            return 7
+        raise Exception('Call GetOsType failed')
+    @staticmethod
+    def GetScreenDepth() -> int:
+        BITSPIXEL = 12
+        hdc = WinSystem.winuser32.GetDC(0)
+        dmBitDepth  = WinSystem.wingdi32.GetDeviceCaps(hdc,BITSPIXEL)
+        WinSystem.winuser32.ReleaseDC(0, hdc)
+        return dmBitDepth
+    @staticmethod
+    def GetScreenHeight() -> int:
+        VERTRES = 10
+        hdc = WinSystem.winuser32.GetDC(0)
+        height  = WinSystem.wingdi32.GetDeviceCaps(hdc,VERTRES)
+        WinSystem.winuser32.ReleaseDC(0, hdc)
+        return height
+    @staticmethod
+    def GetScreenWidth() -> int:
+        HORZRES = 8
+        hdc = WinSystem.winuser32.GetDC(0)
+        weight  = WinSystem.wingdi32.GetDeviceCaps(hdc,HORZRES)
+        WinSystem.winuser32.ReleaseDC(0, hdc)
+        return weight
+    @staticmethod
+    def GetTime() -> int:
+        return WinSystem.winKernel32.timeGetTime()
+    @staticmethod
+    def Is64Bit() -> bool:
+        class _SYSTEM_INFO(ctypes.Structure):
+            _fields_ = [
+                ("dwOemId",ctypes.wintypes.DWORD),
+                ("dwProcessorType",ctypes.wintypes.DWORD),
+                ("lpMinimumApplicationAddress",ctypes.wintypes.LPVOID),
+                ("lpMaximumApplicationAddress",ctypes.wintypes.LPVOID),
+                ("dwActiveProcessorMask",ctypes.wintypes.LPVOID),
+                ("dwNumberOfProcessors",ctypes.wintypes.DWORD),
+                ("dwProcessorType",ctypes.wintypes.DWORD),
+                ("dwAllocationGranularity",ctypes.wintypes.DWORD),
+                ("wProcessorLevel",ctypes.wintypes.WORD),
+                ("wProcessorRevision",ctypes.wintypes.WORD),
+            ]
+        lpSystemInfo = _SYSTEM_INFO()
+        WinSystem.winKernel32.GetNativeSystemInfo(ctypes.byref(lpSystemInfo))
+        PROCESSOR_ARCHITECTURE_IA64 = 6
+        PROCESSOR_ARCHITECTURE_AMD64 = 9
+        if lpSystemInfo.dwOemId in [PROCESSOR_ARCHITECTURE_IA64,PROCESSOR_ARCHITECTURE_AMD64]:
+            return True
+        else:
+            return False
+    @staticmethod
+    def Play(media_file)->str:
+        mp3id = str(uuid.uuid1())
+        cmd = "open \""+ media_file + "\" alias " + mp3id
+        status = WinSystem.winwinmm.mciSendStringW(cmd,0,0,0)
+        if status != 0:
+            raise Exception('Call Play failed')
+        status = WinSystem.winwinmm.mciSendStringW("play "+ mp3id,0,0,0)
+        if status != 0:
+            WinSystem.winwinmm.mciSendStringW("close "+ mp3id,0,0,0)
+            raise Exception('Call Play failed')
+        return mp3id
+    @staticmethod
+    def RunApp(app_path,mode)->None:
+        subprocess.Popen(app_path,shell=mode)
+    @staticmethod
+    def SetClipboard(value)->None:
+        '''需安装pywin32'''
+        import win32clipboard
+        import win32con
+        win32clipboard.OpenClipboard()
+        win32clipboard.SetClipboardData(win32con.CF_UNICODETEXT, value)
+        win32clipboard.CloseClipboard()
+    @staticmethod
+    def SetScreen(width,height,depth) -> None:
+        '''需安装pywin32'''
+        import win32api
+        dm = win32api.EnumDisplaySettings(None, 0)
+        dm.PelsHeight = height
+        dm.PelsWidth = width
+        dm.BitsPerPel = depth
+        dm.DisplayFixedOutput = 0
+        win32api.ChangeDisplaySettings(dm, 0)
+    @staticmethod
+    def SetUAC() -> None:
+        key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System')
+        return winreg.SetValueEx(key,'EnableLUA',0,winreg.REG_DWORD,0)
+    @staticmethod
+    def Stop(id_) -> None:
+        status = WinSystem.winwinmm.mciSendStringW("stop "+ id_,0,0,0)
+        if status != 0:
+            raise Exception('Call Stop failed')
+        status = WinSystem.winwinmm.mciSendStringW("close "+ id_,0,0,0)
+        if status != 0:
+            raise Exception('Call Stop failed')
