@@ -69,9 +69,42 @@
 * [x] WriteFile 向指定文件追加字符串. 
 * [ ] WriteIni 向指定的Ini写入信息.  
 * [ ] WriteIniPwd 向指定的Ini写入信息.支持加密文件 
-### 键鼠
+### 键鼠(dminput.py)
+* [x] EnableMouseAccuracy 设置当前系统鼠 标的精确度开关. 如果所示。 此接口仅仅对MoveR接口起作用.
+* [x] GetCursorPos 获取鼠标位置.
+* [x] GetCursorShape 获取鼠标特征码.
+* [x] GetCursorShapeEx 获取鼠标特征码.(实现不完整)
+* [x] GetCursorSpot 获取鼠标热点位置.(实现不完整)
+* [x] GetKeyState 获取指定的按键状态.
+* [x] GetMouseSpeed 获取系统鼠标的移动速度.
+* [x] KeyDown 按住指定的虚拟键码
+* [x] KeyDownChar 按住指定的虚拟键码
+* [x] KeyPress 按下指定的虚拟键码
+* [x] KeyPressChar 按下指定的虚拟键码
+* [x] KeyPressStr 根据指定的字符串序列，依次按顺序按下其中的字符.
+* [x] KeyUp 弹起来虚拟键vk_code
+* [x] KeyUpChar 弹起来虚拟键vk_code
+* [x] LeftClick 按下鼠标左键
+* [x] LeftDoubleClick 双击鼠标左键
+* [x] LeftDown 按住鼠标左键
+* [x] LeftUp 弹起鼠标左键
+* [x] MiddleClick 按下鼠标中键
+* [x] MiddleDown 按住鼠标中键
+* [x] MiddleUp 弹起鼠标中键
+* [x] MoveR 鼠标相对于上次的位置移动rx,ry. 
+* [x] MoveTo 把鼠标移动到目的点(x,y)
+* [x] MoveToEx 把鼠标移动到目的范围内的任意一点
+* [x] RightClick 按下鼠标右键
+* [x] RightDown 按住鼠标右键
+* [x] RightUp 弹起鼠标右键
+* [ ] SetKeypadDelay 设置按键时,键盘按下和弹起的时间间隔。(暂不支持)
+* [ ] SetMouseDelay 设置鼠标单击或者双击时,鼠标按下和弹起的时间间隔。(暂不支持)
+* [x] SetMouseSpeed 设置系统鼠标的移动速度. 
+* [ ] SetSimMode 设置前台键鼠的模拟方式.(暂不支持)
+* [x] WaitKey 等待指定的按键按下 (前台,不是后台)
+* [x] WheelDown 滚轮向下滚
+* [x] WheelUp 滚轮向上滚
 ### 窗口
 ### 内存
 ### 图色
 ### (待定)
-
