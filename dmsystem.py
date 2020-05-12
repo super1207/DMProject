@@ -96,7 +96,7 @@ class DMSystem():
     def EnableFontSmooth() -> None:
         SPI_SETFONTSMOOTHING  = 0x004B
         SPIF_SENDWININICHANGE = 0x0002
-        is_ok:bool = DMSystem.winuser32.SystemParametersInfoW(SPI_SETSCREENSAVEACTIVE,1,0, SPIF_SENDWININICHANGE)
+        is_ok:bool = DMSystem.winuser32.SystemParametersInfoW(SPI_SETFONTSMOOTHING,1,0, SPIF_SENDWININICHANGE)
         if not is_ok:
             raise Exception('Call EnableFontSmooth failed')
     @staticmethod
