@@ -105,9 +105,8 @@
 * [x] WheelDown 滚轮向下滚
 * [x] WheelUp 滚轮向上滚
 ### 窗口
-* [ ] ClientToScreen 把窗口坐标转换为屏幕坐标 
-* [ ] EnumProcess 根据指定进程名,枚举系统中符合条件的进程PID,并且按照进程打开顺序排序.
-* [ ] EnumProcess 根据指定进程名,枚举系统中符合条件的进程PID,并且按照进程打开顺序排序.
+* [x] ClientToScreen 把窗口坐标转换为屏幕坐标 
+* [x] EnumProcess 根据指定进程名,枚举系统中符合条件的进程PID,并且按照进程打开顺序排序.
 * [ ] EnumWindow 根据指定条件,枚举系统中符合条件的窗口
 * [ ] EnumWindowByProcess 根据指定进程以及其它条件,枚举系统中符合条件的窗口
 * [ ] EnumWindowByProcessId 根据指定进程pid以及其它条件,枚举系统中符合条件的窗口
@@ -117,33 +116,33 @@
 * [x] FindWindowByProcessId 根据指定的进程Id，来查找可见窗口.
 * [x] FindWindowEx 查找符合类名或者标题名的顶层可见窗口,如果指定了parent,则在parent的第一层子窗口中查找.
 * [ ] FindWindowSuper 根据两组设定条件来查找指定窗口. 
-* [ ] GetClientRect 获取窗口客户区域在屏幕上的位置
-* [ ] GetClientSize 获取窗口客户区域的宽度和高度
-* [ ] GetForegroundFocus 获取顶层活动窗口中具有输入焦点的窗口句柄
-* [ ] GetForegroundWindow 获取顶层活动窗口
-* [ ] GetMousePointWindow 获取鼠标指向的可见窗口句柄
-* [ ] GetPointWindow 获取给定坐标的可见窗口句柄,可以获取到按键自带的插件无法获取到的句柄
+* [x] GetClientRect 获取窗口客户区域在屏幕上的位置
+* [x] GetClientSize 获取窗口客户区域的宽度和高度
+* [x] GetForegroundFocus 获取顶层活动窗口中具有输入焦点的窗口句柄
+* [x] GetForegroundWindow 获取顶层活动窗口
+* [x] GetMousePointWindow 获取鼠标指向的可见窗口句柄
+* [x] GetPointWindow 获取给定坐标的可见窗口句柄
 * [x] GetProcessInfo 根据指定的pid获取进程详细信息,(进程名,进程全路径,CPU占用率(百分比),内存占用量(字节))
 * [x] GetSpecialWindow 获取特殊窗口
-* [ ] GetWindow 获取给定窗口相关的窗口句柄
+* [x] GetWindow 获取给定窗口相关的窗口句柄
 * [x] GetWindowClass 获取窗口的类名
 * [x] GetWindowProcessId 获取指定窗口所在的进程ID.
 * [x] GetWindowProcessPath 获取指定窗口所在的进程的exe文件全路径.
-* [ ] GetWindowRect 获取窗口在屏幕上的位置
-* [ ] GetWindowState 获取指定窗口的一些属性
+* [x] GetWindowRect 获取窗口在屏幕上的位置
+* [x] GetWindowState 获取指定窗口的一些属性
 * [x] GetWindowTitle 获取窗口的标题
-* [ ] MoveWindow 移动指定窗口到指定位置
-* [ ] ScreenToClient 把屏幕坐标转换为窗口坐标
-* [ ] SendPaste 向指定窗口发送粘贴命令. 把剪贴板的内容发送到目标窗口.
+* [x] MoveWindow 移动指定窗口到指定位置
+* [x] ScreenToClient 把屏幕坐标转换为窗口坐标
+* [x] SendPaste 向指定窗口发送粘贴命令. 把剪贴板的内容发送到目标窗口.
 * [ ] SendString 向指定窗口发送文本数据
 * [ ] SendString2 向指定窗口发送文本数据
 * [ ] SendStringIme 向绑定的窗口发送文本数据.必须配合dx.public.input.ime属性.
 * [ ] SendStringIme2 利用真实的输入法，对指定的窗口输入文字.
-* [ ] SetClientSize 设置窗口客户区域的宽度和高度
-* [ ] SetWindowSize 设置窗口的大小
+* [x] SetClientSize 设置窗口客户区域的宽度和高度
+* [x] SetWindowSize 设置窗口的大小
 * [ ] SetWindowState 设置窗口的状态
-* [ ] SetWindowText 设置窗口的标题
-* [ ] SetWindowTransparent 设置窗口的透明度
+* [x] SetWindowText 设置窗口的标题
+* [x] SetWindowTransparent 设置窗口的透明度
 ### 内存
 ### 图色
 ### (待定)
