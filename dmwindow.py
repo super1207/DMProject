@@ -110,7 +110,6 @@ class DMWindow():
             except:
                 return True
             if(lProcessName == None):lProcessName = ""
-            print(lProcessName)
             if process_name.upper() not in lProcessName.upper():
                 return True
             if class_.upper() not in DMWindow.GetWindowClass(hwnd).upper():
@@ -151,7 +150,6 @@ class DMWindow():
     def GetWindowTitle(hwnd) -> str:
         titleStr = ctypes.create_string_buffer(''.encode(), 1000)
         is_ok:bool = DMWindow.winuser32.GetWindowTextA(hwnd,titleStr,1000)
-        #print("++"+ctypes.string_at(titleStr).decode('GB2312')+"++")
         if (not is_ok) and DMWindow.winKernel32.GetLastError() != 0:
             raise Exception("call GetWindowTitle failed")
         return ctypes.string_at(titleStr).decode('GB2312')
@@ -183,7 +181,6 @@ class DMWindow():
     def GetForegroundFocus() -> int:
         wnd:int = DMWindow.GetForegroundWindow()
         if not wnd:
-            print(DMWindow.winKernel32.GetLastError())
             raise Exception('call GetForegroundFocus Failed')
         SelfThreadId = DMWindow.winKernel32.GetCurrentThreadId()
         ForeThreadId = DMWindow.winuser32.GetWindowThreadProcessId(wnd,0)
@@ -191,7 +188,6 @@ class DMWindow():
         wnd = DMWindow.winuser32.GetFocus()
         DMWindow.winuser32.AttachThreadInput(ForeThreadId, SelfThreadId, False)
         if not wnd:
-            print(DMWindow.winKernel32.GetLastError())
             raise Exception('call GetForegroundFocus Failed')
         return wnd
     @staticmethod
@@ -246,6 +242,8 @@ class DMWindow():
             rethwnd = DMWindow.winuser32.GetWindow(hwnd,4)
             if not rethwnd:
                 rethwnd = DMWindow.winuser32.GetParent(hwnd)
+            if not rethwnd:
+                rethwnd = hwnd
         elif flag == 7:
             rethwnd = DMWindow.winuser32.GetTopWindow(hwnd)
             # top = hwnd
@@ -322,7 +320,6 @@ class DMWindow():
             is_ok:bool = DMWindow.winKernel32.IsWow64Process(hProcess,ctypes.pointer(isWow64Process))
             DMWindow.winKernel32.CloseHandle(hProcess)
             if not is_ok:
-                print(DMWindow.winKernel32.GetLastError())
                 raise Exception('call GetWindowState failed:IsWow64Process')
             if isWow64Process.value:
                 return False
@@ -418,26 +415,75 @@ class DMWindow():
             ]
         if not DMWindow.GetWindowState(hwnd,0):
             raise Exception('call SendPaste failed:window not exist')
-        hCurWnd = DMWindow.winuser32.GetForegroundWindow()
-        dwMyID = DMWindow.winKernel32.GetCurrentThreadId()
-        dwCurID = DMWindow.winuser32.GetWindowThreadProcessId(hCurWnd, 0)
-        DMWindow.winuser32.AttachThreadInput(dwCurID, dwMyID, True)
         wtp = WINDOWPLACEMENT()
         DMWindow.winuser32.GetWindowPlacement(hwnd,ctypes.byref(wtp))
-        print(wtp.showCmd)
         if(wtp.showCmd != 1): # 没有最小化
             if wtp.showCmd == 2:#被最小化了
                 wtp.showCmd = 9
                 DMWindow.winuser32.SetWindowPlacement(hwnd,ctypes.byref(wtp))
         # 正常情况下wtp.showCmd为3，表示前台
         DMWindow.winuser32.SetForegroundWindow(hwnd)
-        DMWindow.winuser32.SetActiveWindow(hwnd)
         DMWindow.winuser32.BringWindowToTop(hwnd)
-        DMWindow.winuser32.AttachThreadInput(dwCurID, dwMyID, False)
         DMWindow.winuser32.keybd_event(0x11, 0, 0x0001, 0); 
         DMWindow.winuser32.keybd_event(86, 0, 0x0001, 0); 
         DMWindow.winuser32.keybd_event(86, 0, 0x0001|0x0002, 0)
         DMWindow.winuser32.keybd_event(0x11, 0, 0x0001|0x0002, 0)
+    @staticmethod
+    def SetWindowState(hwnd,flag):
+        class WINDOWPLACEMENT(ctypes.Structure):
+            _fields_ = [
+                ("length",ctypes.wintypes.UINT),
+                ("flags",ctypes.wintypes.UINT),
+                ("showCmd",ctypes.wintypes.UINT),
+                ("ptMinPosition",ctypes.wintypes.POINT),
+                ("ptMaxPosition",ctypes.wintypes.POINT),
+                ("rcNormalPosition",ctypes.wintypes.RECT)
+            ]
+        is_ok = False
+        if flag == 0:
+            is_ok = DMWindow.winuser32.SendMessageW(hwnd, 0x0010, 0, 0)
+        elif flag == 1:
+            is_ok = DMWindow.winuser32.SetActiveWindow(hwnd)
+        elif flag == 2 or flag == 3:
+            is_ok = DMWindow.winuser32.ShowWindow(hwnd,2)
+        elif flag == 4:
+            is_ok = DMWindow.winuser32.ShowWindow(hwnd,3)
+            is_ok = DMWindow.winuser32.SetActiveWindow(hwnd)
+        elif flag == 5:
+            wtp = WINDOWPLACEMENT()
+            is_ok = DMWindow.winuser32.GetWindowPlacement(hwnd,ctypes.byref(wtp))
+            wtp.showCmd = 9
+            is_ok = DMWindow.winuser32.SetWindowPlacement(hwnd,ctypes.byref(wtp))
+        elif flag == 6:
+            wtp = WINDOWPLACEMENT()
+            is_ok = DMWindow.winuser32.GetWindowPlacement(hwnd,ctypes.byref(wtp))
+            wtp.showCmd = 0
+            is_ok = DMWindow.winuser32.SetWindowPlacement(hwnd,ctypes.byref(wtp))
+        elif flag == 7:
+            wtp = WINDOWPLACEMENT()
+            is_ok = DMWindow.winuser32.GetWindowPlacement(hwnd,ctypes.byref(wtp))
+            wtp.showCmd = 5
+            is_ok = DMWindow.winuser32.SetWindowPlacement(hwnd,ctypes.byref(wtp))
+        elif flag == 8:
+            is_ok = DMWindow.winuser32.SetWindowPos(hwnd,-1,0,0,0,0,3)
+        elif flag == 9:
+            is_ok = DMWindow.winuser32.SetWindowPos(hwnd,-2,0,0,0,0,3)
+        elif flag in [10,11,12]:
+            pass
+        elif flag == 13:
+            pid = DMWindow.GetWindowProcessId(hwnd)
+            hProcessHandle = DMWindow.winKernel32.OpenProcess(1, False, pid)
+            is_ok = DMWindow.winKernel32.TerminateProcess(hProcessHandle,4)
+            DMWindow.winKernel32.CloseHandle(hProcessHandle)
+        elif flag == 14:
+            is_ok = DMWindow.winuser32.FlashWindow(hwnd,True)
+        elif flag == 15:
+            hCurWnd = DMWindow.winuser32.GetForegroundWindow()
+            dwMyID = DMWindow.winKernel32.GetCurrentThreadId()
+            dwCurID = DMWindow.winuser32.GetWindowThreadProcessId(hCurWnd, 0)
+            DMWindow.winuser32.AttachThreadInput(dwCurID, dwMyID, True)
+            is_ok = DMWindow.winuser32.SetFocus(hwnd)
+            DMWindow.winuser32.AttachThreadInput(dwCurID, dwMyID, False)
+        if not is_ok:
+            raise Exception('call SetWindowState failed')
 
-# # test
-# print(DMWindow.SendPaste(DMWindow.FindWindowByProcess("WeChat.exe","","")))
