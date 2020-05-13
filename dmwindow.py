@@ -143,7 +143,6 @@ class DMWindow():
         return lProcessId.value
     @staticmethod
     def GetWindowTitle(hwnd) -> str:
-        
         titleStr = ctypes.create_string_buffer(''.encode(), 1000)
         is_ok:bool = DMWindow.winuser32.GetWindowTextA(hwnd,titleStr,1000)
         #print("++"+ctypes.string_at(titleStr).decode('GB2312')+"++")
@@ -168,3 +167,265 @@ class DMWindow():
             return DMWindow.winuser32.FindWindowW("Shell_TrayWnd",0)
         else:
             raise Exception('call GetSpecialWindow Failed')
+    @staticmethod
+    def GetForegroundWindow() -> int:
+        is_ok:int = DMWindow.winuser32.GetForegroundWindow()
+        if not is_ok:
+            raise Exception('call GetForegroundWindow Failed')
+        return is_ok
+    @staticmethod
+    def GetForegroundFocus() -> int:
+        wnd:int = DMWindow.GetForegroundWindow()
+        if not wnd:
+            print(DMWindow.winKernel32.GetLastError())
+            raise Exception('call GetForegroundFocus Failed')
+        SelfThreadId = DMWindow.winKernel32.GetCurrentThreadId()
+        ForeThreadId = DMWindow.winuser32.GetWindowThreadProcessId(wnd,0)
+        DMWindow.winuser32.AttachThreadInput(ForeThreadId, SelfThreadId, True)
+        wnd = DMWindow.winuser32.GetFocus()
+        DMWindow.winuser32.AttachThreadInput(ForeThreadId, SelfThreadId, False)
+        if not wnd:
+            print(DMWindow.winKernel32.GetLastError())
+            raise Exception('call GetForegroundFocus Failed')
+        return wnd
+    @staticmethod
+    def GetMousePointWindow() ->int:
+        class POINT(ctypes.Structure):
+            _fields_ = [
+                ("x",ctypes.wintypes.LONG),
+                ("y",ctypes.wintypes.LONG)
+            ]
+        point = POINT()
+        DMWindow.winuser32.GetCursorPos(ctypes.byref(point))
+        hwnd = DMWindow.winuser32.WindowFromPoint(point)
+        if not hwnd:
+            raise Exception('call GetMousePointWindow failed')
+        return hwnd
+    @staticmethod
+    def GetPointWindow(x,y) -> int:
+        class POINT(ctypes.Structure):
+            _fields_ = [
+                ("x",ctypes.wintypes.LONG),
+                ("y",ctypes.wintypes.LONG)
+            ]
+        point = POINT()
+        point.x = x
+        point.y = y
+        hwnd = DMWindow.winuser32.WindowFromPoint(point)
+        if not hwnd:
+            raise Exception('call GetMousePointWindow failed')
+        return hwnd
+    @staticmethod
+    def GetWindow(hwnd,flag) -> int:
+        rethwnd = None
+        if flag == 0:
+            rethwnd = DMWindow.winuser32.GetParent(hwnd)
+        elif flag == 1:
+            rethwnd = DMWindow.winuser32.GetWindow(hwnd,5)
+            # def mycallback(hwnd,extra) -> bool:
+            #     nonlocal rethwnd
+            #     rethwnd = hwnd
+            #     return False
+            # CMPFUNC = ctypes.WINFUNCTYPE(ctypes.wintypes.BOOL,ctypes.wintypes.HWND, ctypes.wintypes.LPARAM)
+            # DMWindow.winuser32.EnumChildWindows(hwnd,CMPFUNC(mycallback),0)
+        elif flag == 2:
+            rethwnd = DMWindow.winuser32.GetWindow(hwnd,0)
+        elif flag == 3:
+            rethwnd = DMWindow.winuser32.GetWindow(hwnd,1)
+        elif flag == 4:
+            rethwnd = DMWindow.winuser32.GetWindow(hwnd,2)
+        elif flag == 5:
+            rethwnd = DMWindow.winuser32.GetWindow(hwnd,3)
+        elif flag == 6:
+            rethwnd = DMWindow.winuser32.GetWindow(hwnd,4)
+            if not rethwnd:
+                rethwnd = DMWindow.winuser32.GetParent(hwnd)
+        elif flag == 7:
+            rethwnd = DMWindow.winuser32.GetTopWindow(hwnd)
+            # top = hwnd
+            # while True:
+            #     hd = DMWindow.winuser32.GetParent(top)
+            #     if not hd:
+            #         rethwnd = top
+            #         break
+            #     top = hd
+        if not rethwnd:
+            raise Exception('call GetWindow failed')
+        return rethwnd
+    @staticmethod
+    def GetWindowRect(hwnd) -> tuple:
+        rect = ctypes.wintypes.RECT()
+        is_ok:bool = DMWindow.winuser32.GetWindowRect(hwnd,ctypes.byref(rect))
+        if not is_ok:
+            raise Exception('call GetWindowRect failed')
+        return (rect.left,rect.top,rect.right,rect.bottom)
+    @staticmethod
+    def GetWindowState(hwnd,flag) -> bool:
+        if flag == 0:
+            return DMWindow.winuser32.IsWindow(hwnd) == 1
+        elif flag == 1:
+            return DMWindow.GetForegroundWindow() == hwnd
+        elif flag == 2:
+            return DMWindow.winuser32.IsWindowVisible(hwnd) == 1
+        elif flag == 3:
+            return DMWindow.winuser32.IsIconic(hwnd) == 1
+        elif flag == 4:
+            return DMWindow.winuser32.IsZoomed(hwnd) == 1
+        elif flag == 5:
+            GWL_EXSTYLE = -20
+            WS_EX_TOPMOST = 0x00000008
+            if (DMWindow.winuser32.GetWindowLongA(hwnd,GWL_EXSTYLE) &  WS_EX_TOPMOST):
+                return True
+            else:
+                return False
+        elif flag == 6 or flag == 8:
+            return DMWindow.winuser32.IsHungAppWindow(hwnd) == 1
+        elif flag == 7:
+            return DMWindow.winuser32.IsWindowEnabled(hwnd) == 1
+        elif flag == 9:
+            def Is64Bit() -> bool:
+                class _SYSTEM_INFO(ctypes.Structure):
+                    _fields_ = [
+                        ("dwOemId",ctypes.wintypes.DWORD),
+                        ("dwProcessorType",ctypes.wintypes.DWORD),
+                        ("lpMinimumApplicationAddress",ctypes.wintypes.LPVOID),
+                        ("lpMaximumApplicationAddress",ctypes.wintypes.LPVOID),
+                        ("dwActiveProcessorMask",ctypes.wintypes.LPVOID),
+                        ("dwNumberOfProcessors",ctypes.wintypes.DWORD),
+                        ("dwProcessorType",ctypes.wintypes.DWORD),
+                        ("dwAllocationGranularity",ctypes.wintypes.DWORD),
+                        ("wProcessorLevel",ctypes.wintypes.WORD),
+                        ("wProcessorRevision",ctypes.wintypes.WORD),
+                    ]
+                lpSystemInfo = _SYSTEM_INFO()
+                DMWindow.winKernel32.GetNativeSystemInfo(ctypes.byref(lpSystemInfo))
+                PROCESSOR_ARCHITECTURE_IA64 = 6
+                PROCESSOR_ARCHITECTURE_AMD64 = 9
+                if lpSystemInfo.dwOemId in [PROCESSOR_ARCHITECTURE_IA64,PROCESSOR_ARCHITECTURE_AMD64]:
+                    return True
+                else:
+                    return False
+            if not Is64Bit():
+                return False
+            isWow64Process = ctypes.wintypes.BOOL(True)
+            processId = DMWindow.GetWindowProcessId(hwnd)
+            PROCESS_QUERY_INFORMATION =  0x0400
+            hProcess = DMWindow.winKernel32.OpenProcess(PROCESS_QUERY_INFORMATION, False, processId)
+            if not hProcess:
+                raise Exception('call GetWindowState failed:OpenProcess')
+            is_ok:bool = DMWindow.winKernel32.IsWow64Process(hProcess,ctypes.pointer(isWow64Process))
+            DMWindow.winKernel32.CloseHandle(hProcess)
+            if not is_ok:
+                print(DMWindow.winKernel32.GetLastError())
+                raise Exception('call GetWindowState failed:IsWow64Process')
+            if isWow64Process.value:
+                return False
+            return True
+    @staticmethod
+    def GetClientSize(hwnd) -> tuple:
+        rect = ctypes.wintypes.RECT()
+        is_ok:bool = DMWindow.winuser32.GetClientRect(hwnd,ctypes.byref(rect))
+        if not is_ok:
+            raise Exception('call GetClientRect failed')
+        return (rect.right,rect.bottom)
+    @staticmethod
+    def ClientToScreen(hwnd,x,y) -> tuple:
+        point = ctypes.wintypes.POINT()
+        point.x = x
+        point.y = y
+        is_ok:bool = DMWindow.winuser32.ClientToScreen(hwnd,ctypes.byref(point))
+        if not is_ok:
+            raise Exception('call ClientToScreen failed')
+        return (point.x,point.y)
+    @staticmethod
+    def ScreenToClient(hwnd,x,y) -> tuple:
+        point = ctypes.wintypes.POINT()
+        point.x = x
+        point.y = y
+        is_ok:bool = DMWindow.winuser32.ScreenToClient(hwnd,ctypes.byref(point))
+        if not is_ok:
+            raise Exception('call ScreenToClient failed')
+        return (point.x,point.y)
+    @staticmethod
+    def GetClientRect(hwnd) -> tuple:
+        x1,y1 = DMWindow.ClientToScreen(hwnd,0,0)
+        x2,y2 = DMWindow.GetClientSize(hwnd)
+        x2,y2 = DMWindow.ClientToScreen(hwnd,x2,y2)
+        return (x1,y1,x2,y2)
+    @staticmethod
+    def MoveWindow(hwnd,x,y) -> None:
+        x1,y1,x2,y2 = DMWindow.GetWindowRect(hwnd)
+        is_ok:bool = DMWindow.winuser32.MoveWindow(hwnd,0,0,x2-x1,y2-y1,True)
+        if not is_ok:
+            raise Exception('call MoveWindow failed')
+    @staticmethod
+    def SetWindowSize(hwnd,width,height) -> None:
+        x1,y1,x2,y2 = DMWindow.GetWindowRect(hwnd)
+        is_ok:bool = DMWindow.winuser32.MoveWindow(hwnd,x1,y1,width,height,True)
+        if not is_ok:
+            raise Exception('call SetWindowSize failed')
+    @staticmethod
+    def SetWindowText(hwnd,title):
+        is_ok:bool = DMWindow.winuser32.SetWindowTextW(hwnd,title)
+        if not is_ok:
+            raise Exception('call SetWindowText failed')
+    @staticmethod
+    def SetWindowTransparent(hwnd,trans):
+        is_ok:bool = DMWindow.winuser32.SetLayeredWindowAttributes(hwnd, 0, trans, 2)
+        if not is_ok:
+            raise Exception('call SetWindowTransparent failed')
+    @staticmethod
+    def SetClientSize(hwnd,width,height) -> None:
+        wx1,wy1,wx2,wy2 = DMWindow.GetWindowRect(hwnd)
+        w,h = DMWindow.GetClientSize(hwnd)
+        DMWindow.SetWindowSize(hwnd,wx2-wx1+width-w,wy2-wy1+height-h)
+    @staticmethod
+    def EnumProcess(name) -> str:
+        '''需安装psutil'''
+        try:
+            import psutil
+        except:
+            raise Exception("called EnumProcess failed:psutil not install")
+        ret = []
+        for proc in psutil.process_iter():
+            pinfo = proc.as_dict(attrs=['pid','name','create_time'])
+            pname = ''
+            if pinfo['name'] != None:
+                pname = pinfo['name'].upper()
+            if name.upper() in pname:
+                ret.append((pinfo['pid'],pinfo['create_time']))
+        if len(ret) == 0:
+            raise Exception("called EnumProcess failed:process not found")
+        ret = sorted(ret,key = lambda x:x[1])
+        ret = [str(i[0]) for i in ret]
+        return ','.join(ret)
+    @staticmethod
+    def SendPaste(hwnd) -> None:
+        class WINDOWPLACEMENT(ctypes.Structure):
+            _fields_ = [
+                ("length",ctypes.wintypes.UINT),
+                ("flags",ctypes.wintypes.UINT),
+                ("showCmd",ctypes.wintypes.UINT),
+                ("ptMinPosition",ctypes.wintypes.POINT),
+                ("ptMaxPosition",ctypes.wintypes.POINT),
+                ("rcNormalPosition",ctypes.wintypes.RECT)
+            ]
+        if not DMWindow.GetWindowState(hwnd,0):
+            raise Exception('call SendPaste failed:window not exist')
+        hCurWnd = DMWindow.winuser32.GetForegroundWindow()
+        dwMyID = DMWindow.winKernel32.GetCurrentThreadId()
+        dwCurID = DMWindow.winuser32.GetWindowThreadProcessId(hCurWnd, 0)
+        DMWindow.winuser32.AttachThreadInput(dwCurID, dwMyID, True)
+        wtp = WINDOWPLACEMENT()
+        DMWindow.winuser32.GetWindowPlacement(hwnd,ctypes.byref(wtp))
+        SW_RESTORE = 9
+        wtp.showCmd = SW_RESTORE
+        DMWindow.winuser32.SetWindowPlacement(hwnd,ctypes.byref(wtp))
+        DMWindow.winuser32.SetForegroundWindow(hwnd)
+        DMWindow.winuser32.SetActiveWindow(hwnd)
+        DMWindow.winuser32.BringWindowToTop(hwnd)
+        DMWindow.winuser32.AttachThreadInput(dwCurID, dwMyID, False)
+        DMWindow.winuser32.keybd_event(0x11, 0, 0x0001, 0); 
+        DMWindow.winuser32.keybd_event(86, 0, 0x0001, 0); 
+        DMWindow.winuser32.keybd_event(86, 0, 0x0001|0x0002, 0)
+        DMWindow.winuser32.keybd_event(0x11, 0, 0x0001|0x0002, 0)
