@@ -103,8 +103,14 @@ class DMWindow():
         def mycallback(hwnd,extra) -> bool:
             if not DMWindow.winuser32.IsWindowVisible(hwnd):
                 return True
-            lProcessId = DMWindow.GetWindowProcessId()
-            lProcessName = psutil.Process(lProcessId).name()
+            lProcessId = DMWindow.GetWindowProcessId(hwnd)
+            lProcessName = None
+            try:#有些进程是无法打开的
+                lProcessName = psutil.Process(lProcessId).name()
+            except:
+                return True
+            if(lProcessName == None):lProcessName = ""
+            print(lProcessName)
             if process_name.upper() not in lProcessName.upper():
                 return True
             if class_.upper() not in DMWindow.GetWindowClass(hwnd).upper():
@@ -418,9 +424,12 @@ class DMWindow():
         DMWindow.winuser32.AttachThreadInput(dwCurID, dwMyID, True)
         wtp = WINDOWPLACEMENT()
         DMWindow.winuser32.GetWindowPlacement(hwnd,ctypes.byref(wtp))
-        SW_RESTORE = 9
-        wtp.showCmd = SW_RESTORE
-        DMWindow.winuser32.SetWindowPlacement(hwnd,ctypes.byref(wtp))
+        print(wtp.showCmd)
+        if(wtp.showCmd != 1): # 没有最小化
+            if wtp.showCmd == 2:#被最小化了
+                wtp.showCmd = 9
+                DMWindow.winuser32.SetWindowPlacement(hwnd,ctypes.byref(wtp))
+        # 正常情况下wtp.showCmd为3，表示前台
         DMWindow.winuser32.SetForegroundWindow(hwnd)
         DMWindow.winuser32.SetActiveWindow(hwnd)
         DMWindow.winuser32.BringWindowToTop(hwnd)
@@ -429,3 +438,6 @@ class DMWindow():
         DMWindow.winuser32.keybd_event(86, 0, 0x0001, 0); 
         DMWindow.winuser32.keybd_event(86, 0, 0x0001|0x0002, 0)
         DMWindow.winuser32.keybd_event(0x11, 0, 0x0001|0x0002, 0)
+
+# # test
+# print(DMWindow.SendPaste(DMWindow.FindWindowByProcess("WeChat.exe","","")))
