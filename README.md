@@ -140,7 +140,7 @@
 * [ ] SendStringIme2 利用真实的输入法，对指定的窗口输入文字.
 * [x] SetClientSize 设置窗口客户区域的宽度和高度
 * [x] SetWindowSize 设置窗口的大小
-* [ ] SetWindowState 设置窗口的状态
+* [x] SetWindowState 设置窗口的状态(实现不完整)
 * [x] SetWindowText 设置窗口的标题
 * [x] SetWindowTransparent 设置窗口的透明度
 ### 内存
