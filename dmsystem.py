@@ -359,3 +359,12 @@ class DMSystem():
         status = DMSystem.winwinmm.mciSendStringW("close "+ id_,0,0,0)
         if status != 0:
             raise Exception('Call Stop failed')
+    @staticmethod
+    def ShowTaskBarIcon(hwnd,is_show) -> None:
+        is_ok = False
+        if is_show == 0:
+            is_ok = DMSystem.winuser32.SetWindowLongA(67076,-20,0x80)
+        else:
+            is_ok = DMSystem.winuser32.SetWindowLongA(67076,-20,0x40000)
+        if not is_ok:
+            raise Exception('call ShowTaskBarIcon failed')
