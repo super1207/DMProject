@@ -486,4 +486,43 @@ class DMWindow():
             DMWindow.winuser32.AttachThreadInput(dwCurID, dwMyID, False)
         if not is_ok:
             raise Exception('call SetWindowState failed')
-
+    @staticmethod
+    def EnumWindow(parent_,title,class_name,filter):
+        if not parent_:
+            parent_ = DMWindow.GetSpecialWindow(0)
+        martchVec = []
+        def mycallback(hwnd,extra) -> bool:
+            wtitle = None
+            wclass = None
+            try:
+                wtitle = DMWindow.GetWindowTitle(hwnd)
+                wclass = DMWindow.GetWindowClass(hwnd)
+            except:
+                return True
+            if filter & 1 == 1:
+                if title.upper() not in wtitle.upper():
+                    return True
+            if ((filter & 2)>>1) == 1:
+                if class_name.upper() not in wclass.upper():
+                    return True
+            if ((filter & 4)>>2) == 1:
+                try:
+                    if DMWindow.GetWindow(hwnd,0) != parent_:
+                        return True
+                except:
+                    return True
+            if ((filter & 8)>>3) == 1:
+                if not (DMWindow.winuser32.GetParent(hwnd) == 0):
+                    return True
+                if DMWindow.winKernel32.GetLastError() != 0:
+                    return True
+            if ((filter & 16)>>4) == 1:
+                if DMWindow.GetWindowState(2) == False:
+                    return True
+            martchVec.append(hwnd)
+            return True
+        CMPFUNC = ctypes.WINFUNCTYPE(ctypes.wintypes.BOOL,ctypes.wintypes.HWND, ctypes.wintypes.LPARAM)
+        DMWindow.winuser32.EnumChildWindows(parent_,CMPFUNC(mycallback),0)
+        if len(martchVec) == 0:
+            raise Exception('call EnumWindow failed:not found any window')
+        return ','.join([str(i) for i in martchVec])
