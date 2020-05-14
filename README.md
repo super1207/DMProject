@@ -40,7 +40,7 @@
 * [ ] SetLocale 设置当前系统的非UNICOD字符集.(暂不实现)
 * [x] SetScreen 设置系统的分辨率 系统色深 
 * [x] SetUAC 设置当前系统的UAC,重启生效.
-* [ ] ShowTaskBarIcon 显示或者隐藏指定窗口在任务栏的图标.(暂不实现)
+* [x] ShowTaskBarIcon 显示或者隐藏指定窗口在任务栏的图标.
 * [x] Stop 停止指定的音乐.
 ### 文件(dmfile.py)
 * [x] CopyFile 拷贝文件.
