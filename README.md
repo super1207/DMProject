@@ -107,7 +107,7 @@
 ### 窗口
 * [x] ClientToScreen 把窗口坐标转换为屏幕坐标 
 * [x] EnumProcess 根据指定进程名,枚举系统中符合条件的进程PID,并且按照进程打开顺序排序.
-* [ ] EnumWindow 根据指定条件,枚举系统中符合条件的窗口
+* [x] EnumWindow 根据指定条件,枚举系统中符合条件的窗口(实现不完整)
 * [ ] EnumWindowByProcess 根据指定进程以及其它条件,枚举系统中符合条件的窗口
 * [ ] EnumWindowByProcessId 根据指定进程pid以及其它条件,枚举系统中符合条件的窗口
 * [ ] EnumWindowSuper 根据两组设定条件来枚举指定窗口. 
